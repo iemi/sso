@@ -1,25 +1,25 @@
-#概述
-####关于SSO
+# 概述
+#### 关于SSO
 网上关于SSO的介绍非常多，举个例就是，当我们使用浏览器登录了淘宝https://www.taobao.com以后，我们再访问天猫https://www.tmall.com时就不需要再次登录。也就是淘宝和天猫之间只需要登录其中一个业务系统，另一个就自动登录
-####运用场景
+#### 运用场景
 一般情况下，一个公司内肯定不止一个业务系统，公司内相互可信任的系统，我们希望可以实现和淘宝天猫相同的单点登录效果。多个业务系统使用同一个认证服务也能简化开发
-####相关知识
+#### 相关知识
 对于此文你所要了解的相关知识：
 * oauth2.0简介：[http://www.ruanyifeng.com/blog/2019/04/oauth_design.html](http://www.ruanyifeng.com/blog/2019/04/oauth_design.html)
 * oauth2.0的四种方式：[http://www.ruanyifeng.com/blog/2019/04/oauth-grant-types.html](http://www.ruanyifeng.com/blog/2019/04/oauth-grant-types.html)
 * JWT：[https://zhuanlan.zhihu.com/p/27370773](https://zhuanlan.zhihu.com/p/27370773)
 * Spring Security：[https://www.jianshu.com/p/e22fdeedc9a3](https://www.jianshu.com/p/e22fdeedc9a3)
-####Spring Security Oauth+JWT单点登录流程
+#### Spring Security Oauth+JWT单点登录流程
 ![实现原理](https://upload-images.jianshu.io/upload_images/19628259-f8b36f1cb1c57349.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 图中一个认证服务器，两个客户端应用，A和B。用户请求访问A的服务器资源时会被引导到认证服务器进行授权，经过登录认证和同意授权后返回授权码给A，A的服务端收到授权码后再次向认证服务器请求token，最终返回JWT类型的token，A解析接收到的JWT进行解析获取到用户相关信息保存进Spring Security的SecurityContext中实现登录；此时用户再次请求访问B的服务器资源时，B会引导用户到认证服务器进行请求授权，此时不在需要再次登录认证，只要授权确认，确认后返回授权码到B，B再次向认证服务器发起获取token请求，认证服务器返回JWT，B对JWT进行解析，保存用户进Spring Security的SecurityContext中实现登录
-####实现流程
+#### 实现流程
 1. 搭建SSO第三方认证授权服务中心
 2. 搭建客户端应用1
 3. 搭建客户端应用2
 4. 测试
-####前言
+#### 前言
 本文主要阐述使用Spring Security Oauth+JWT实现单点登录和做到客户端的权限控制，不阐述其相关源码和实现原理
-####相关版本
+#### 相关版本
 Spring boot：2.2.0.RELEASE
 ***
 #实现步骤
@@ -31,7 +31,7 @@ Spring boot：2.2.0.RELEASE
 		<version>2.1.4.RELEASE</version>
 </dependency>
 ```
-####搭建认证中心服务
+#### 搭建认证中心服务
 1. 配置文件
 ```
 server.servlet.context-path= /server
@@ -168,7 +168,7 @@ public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws E
                 .accessTokenConverter(jwtAccessTokenConverter());
     }
 ```
-####搭建客户端服务1
+#### 搭建客户端服务1
 1. 配置文件
 ```
 server.port=8081
@@ -228,7 +228,7 @@ public class Client1Controller {
 
 ```
 三个接口分别要求不同的用户权限，ROLE_HIGH、ROLE_MID、ROLE_LOW
-####搭建客户端服务2
+#### 搭建客户端服务2
 两个客户端其实基本一样，我就直接上代码了
 1. 配置文件
 ```
@@ -282,7 +282,7 @@ public class Client2Controller {
 
 }
 ```
-####测试
+#### 测试
 1. **单点登录测试**
 三个服务全部启动，直接访问客户端1的接口localhost:8081/client1/low
 ![访问low接口](https://upload-images.jianshu.io/upload_images/19628259-5a1362db1c050ce2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -301,7 +301,7 @@ public class Client2Controller {
 可以看出访问需要ROLE_LOW和ROLE_MID权限的接口都没问题，再访问[http://localhost:8081/client1/high](http://localhost:8081/client1/high)
 ![访问high失败](https://upload-images.jianshu.io/upload_images/19628259-f4f4e50db2a88788.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 访问需要ROLE_HIGH权限的接口返回403，说明我们的权限控制也实现了
-####工程结构
+#### 工程结构
 最后上一下我的工程结构
 1. 认证中心服务
 ![认证中心](https://upload-images.jianshu.io/upload_images/19628259-b1ea46eee80c75f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -310,11 +310,9 @@ public class Client2Controller {
 3. 客户端2
 ![客户端2](https://upload-images.jianshu.io/upload_images/19628259-6f38576d5cfbdfcb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 ***
-#总结
+# 总结
 * 搭建SSO第三方认证授权服务中心
 * 搭建客户端应用1
 * 搭建客户端应用2
 * 测试
-Github源码地址：[https://github.com/iemi/sso](https://github.com/iemi/sso)
-觉得有用的同学Github给颗星星谢谢啦
 文章详解地址：https://www.jianshu.com/p/f83e8dc3dd9d
